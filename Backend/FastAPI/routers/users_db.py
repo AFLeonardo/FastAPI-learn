@@ -12,7 +12,7 @@ router = APIRouter(prefix="/userdb",
 
 @router.get("/", response_model=list[User]) #Query
 async def user():
-    return users_schema(db_client.local.users.find())
+    return users_schema(db_client.users.find())
 
 @router.get("/{id}") #Path
 async def user(id: str):
@@ -27,7 +27,7 @@ async def user(id: str):
 
 def search_user(field: str, key):
     try:
-        user = db_client.local.users.find_one({field: key})
+        user = db_client.users.find_one({field: key})
         return User(**user_schema(user))
     except:
         return {"error": "User not found"}
@@ -44,9 +44,9 @@ async def create_user(user: User):
     user_dict = dict(user)
     del user_dict["id"]  # Remove id to let MongoDB generate it
 
-    id = db_client.local.users.insert_one(user_dict).inserted_id
+    id = db_client.users.insert_one(user_dict).inserted_id
 
-    new_user = user_schema(db_client.local.users.find_one({"_id": id}))
+    new_user = user_schema(db_client.users.find_one({"_id": id}))
 
     return User(**new_user)
     
@@ -59,7 +59,7 @@ async def update_user(user: User):
 
     try:
         
-        db_client.local.users.find_one_and_replace(
+        db_client.users.find_one_and_replace(
             {"_id": ObjectId(user.id)},
             user_dict 
         )
@@ -72,7 +72,7 @@ async def update_user(user: User):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(id: str):
 
-    found = db_client.local.users.find_one_and_delete({"_id": ObjectId(id)})
+    found = db_client.users.find_one_and_delete({"_id": ObjectId(id)})
 
     if not found:
         return {"error": "User not found"}
