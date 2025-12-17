@@ -5,5 +5,4 @@ from pymongo import MongoClient
 
 #Base de datos en la nube
 
-db_client = MongoClient(
-    "mongodb+srv://admin:tilin22@curso-python.kxqo5gb.mongodb.net/?appName=Curso-Python").test
+db_client = MongoClient(url).test
